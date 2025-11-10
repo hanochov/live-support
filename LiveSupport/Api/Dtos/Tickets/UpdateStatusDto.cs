@@ -1,6 +1,9 @@
-﻿namespace Api.Dtos.Tickets;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Api.Dtos.Tickets;
 
 public class UpdateStatusDto
 {
-    public int Status { get; set; } // 0=Open,1=InProgress,2=Resolved
+    [Range(0, 2)] // 0=Open,1=InProgress,2=Resolved
+    public int Status { get; set; }
 }
