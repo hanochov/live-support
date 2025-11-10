@@ -68,4 +68,29 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = _ => t
 
 app.MapHub<SupportHub>("/rt");
 
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<Infrastructure.Data.AppDbContext>();
+    db.Database.Migrate();
+
+    if (!db.Tickets.Any())
+    {
+        db.Tickets.Add(new Domain.Entities.Ticket
+        {
+            Title = "Demo ticket",
+            CustomerEmail = "demo@example.com",
+            Priority = Domain.Entities.TicketPriority.Medium,
+            Status = Domain.Entities.TicketStatus.Open,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        });
+        db.SaveChanges();
+    }
+}
+
+app.Run();
+
+
+
 app.Run();

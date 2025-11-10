@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/*.user
+**/*.db-wal
+**/*.db-shm
+**/node_modules/
+**/.idea/
+Dockerfile
+docker-compose.yml
