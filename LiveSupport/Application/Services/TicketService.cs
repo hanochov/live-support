@@ -3,7 +3,7 @@ using Domain.Entities;
 
 namespace Application.Services;
 
-public class TicketService(ITicketRepository repo) : ITicketService
+public class TicketService(ITicketRepository repo, ITicketNotifier notifier) : ITicketService
 {
     public Task<IEnumerable<Ticket>> ListAsync(int? status, int? priority, string? search, CancellationToken ct = default)
         => repo.GetAsync(status, priority, search, ct);
@@ -29,6 +29,8 @@ public class TicketService(ITicketRepository repo) : ITicketService
 
         await repo.AddAsync(entity, ct);
         await repo.SaveChangesAsync(ct);
+
+        await notifier.TicketCreatedAsync(entity);
         return entity;
     }
 
@@ -43,6 +45,7 @@ public class TicketService(ITicketRepository repo) : ITicketService
         entity.UpdatedAt = DateTime.UtcNow;
 
         await repo.SaveChangesAsync(ct);
+        await notifier.TicketUpdatedAsync(entity);
         return entity;
     }
 
@@ -53,6 +56,7 @@ public class TicketService(ITicketRepository repo) : ITicketService
         entity.UpdatedAt = DateTime.UtcNow;
 
         await repo.SaveChangesAsync(ct);
+        await notifier.TicketStatusChangedAsync(entity);
         return entity;
     }
 
@@ -61,5 +65,7 @@ public class TicketService(ITicketRepository repo) : ITicketService
         var entity = await repo.GetByIdAsync(id, ct) ?? throw new KeyNotFoundException();
         await repo.RemoveAsync(entity, ct);
         await repo.SaveChangesAsync(ct);
+
+        await notifier.TicketDeletedAsync(id);
     }
 }
