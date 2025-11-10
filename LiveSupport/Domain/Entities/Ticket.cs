@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Entities;
+﻿namespace Domain.Entities;
 
 public enum TicketPriority { Low, Medium, High, Critical }
 public enum TicketStatus { Open, InProgress, Resolved }
