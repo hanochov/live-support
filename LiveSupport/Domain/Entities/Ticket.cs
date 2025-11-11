@@ -13,4 +13,7 @@ public class Ticket
     public TicketStatus Status { get; set; } = TicketStatus.Open;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public int? AgentId { get; set; }   
+    public Agent? Agent { get; set; }  
+
 }

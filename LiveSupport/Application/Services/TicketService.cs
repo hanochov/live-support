@@ -5,8 +5,12 @@ namespace Application.Services;
 
 public class TicketService(ITicketRepository repo, ITicketNotifier notifier) : ITicketService
 {
-    public Task<IEnumerable<Ticket>> ListAsync(int? status, int? priority, string? search, CancellationToken ct = default)
-        => repo.GetAsync(status, priority, search, ct);
+    public async Task<IEnumerable<Ticket>> ListAsync(int? status, int? priority, string? search, int? agentId, CancellationToken ct = default)
+    {
+        var list = await repo.GetAsync(status, priority, search, ct);
+        if (agentId is not null) list = list.Where(t => t.AgentId == agentId);
+        return list;
+    }
 
     public async Task<Ticket> GetByIdAsync(int id, CancellationToken ct = default)
         => await repo.GetByIdAsync(id, ct) ?? throw new KeyNotFoundException();
@@ -29,7 +33,6 @@ public class TicketService(ITicketRepository repo, ITicketNotifier notifier) : I
 
         await repo.AddAsync(entity, ct);
         await repo.SaveChangesAsync(ct);
-
         await notifier.TicketCreatedAsync(entity);
         return entity;
     }
@@ -60,12 +63,21 @@ public class TicketService(ITicketRepository repo, ITicketNotifier notifier) : I
         return entity;
     }
 
+    public async Task AssignAgentAsync(int ticketId, int? agentId, CancellationToken ct = default)
+    {
+        var entity = await repo.GetByIdAsync(ticketId, ct) ?? throw new KeyNotFoundException();
+        entity.AgentId = agentId;
+        entity.UpdatedAt = DateTime.UtcNow;
+
+        await repo.SaveChangesAsync(ct);
+        await notifier.TicketUpdatedAsync(entity);
+    }
+
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
         var entity = await repo.GetByIdAsync(id, ct) ?? throw new KeyNotFoundException();
         await repo.RemoveAsync(entity, ct);
         await repo.SaveChangesAsync(ct);
-
         await notifier.TicketDeletedAsync(id);
     }
 }

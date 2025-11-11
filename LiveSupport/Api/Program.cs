@@ -21,6 +21,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<ITicketNotifier, SignalRNotifier>();
+builder.Services.AddScoped<IAgentRepository, AgentRepository>();
+builder.Services.AddScoped<IAgentService, AgentService>();
 
 builder.Services
     .AddHealthChecks()
@@ -79,6 +81,7 @@ using (var scope = app.Services.CreateScope())
         db.Tickets.Add(new Domain.Entities.Ticket
         {
             Title = "Demo ticket",
+            Description = "Example description for testing the API",
             CustomerEmail = "demo@example.com",
             Priority = Domain.Entities.TicketPriority.Medium,
             Status = Domain.Entities.TicketStatus.Open,
@@ -87,10 +90,20 @@ using (var scope = app.Services.CreateScope())
         });
         db.SaveChanges();
     }
+
+    if (!db.Agents.Any())
+    {
+        db.Agents.AddRange(
+            new Domain.Entities.Agent { Name = "Alice Levi", Email = "alice@example.com" },
+            new Domain.Entities.Agent { Name = "Efraim Cohen", Email = "efraim@example.com" }
+        );
+        db.SaveChanges();
+    }
 }
 
-app.Run();
-
-
 
 app.Run();
+
+
+
+
