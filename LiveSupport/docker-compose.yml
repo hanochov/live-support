@@ -1,18 +1,39 @@
-﻿services:
+﻿version: "3.9"
+
+services:
   api:
-    build: .
+    build:
+      context: "C:/Programing/live-support/LiveSupport"
+      dockerfile: Dockerfile
+    image: livesupport-api:latest
+    container_name: livesupport-api
     ports:
       - "8080:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__Default: "Data Source=/data/app.db"
+      ASPNETCORE_URLS: "http://0.0.0.0:8080"
     volumes:
       - api_data:/data
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 8
+
+  web:
+    build:
+      context: "C:/Programing/support-dashboard"
+      dockerfile: Dockerfile
+      args:
+        VITE_MODE: docker
+    image: livesupport-web:latest
+    container_name: livesupport-web
+    ports:
+      - "8081:80"
+    depends_on:
+      api:
+        condition: service_healthy
 
 volumes:
   api_data:
