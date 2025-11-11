@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities;
+﻿using System.Text.Json.Serialization;
+
+namespace Domain.Entities;
 
 public enum TicketPriority { Low, Medium, High, Critical }
 public enum TicketStatus { Open, InProgress, Resolved }
@@ -13,7 +15,9 @@ public class Ticket
     public TicketStatus Status { get; set; } = TicketStatus.Open;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    public int? AgentId { get; set; }   
+    public int? AgentId { get; set; }
+
+    [JsonIgnore]
     public Agent? Agent { get; set; }  
 
 }

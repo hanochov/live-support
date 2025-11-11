@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities;
+﻿using System.Text.Json.Serialization;
+
+namespace Domain.Entities;
 
 public class Agent
 {
@@ -8,5 +10,6 @@ public class Agent
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    [JsonIgnore]
     public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 }
